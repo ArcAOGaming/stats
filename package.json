@@ -12,9 +12,13 @@
     "deploy-undername": "npm run build && permaweb-deploy --deploy-folder ./dist --arns-name $DEPLOY_ARNS_NAME --undername $DEPLOY_UNDERNAME"
   },
   "dependencies": {
+    "@types/plotly.js": "3.0.0",
+    "ao-js-sdk": "0.0.5",
+    "plotly.js": "3.0.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-ga4": "2.1.0",
+    "react-plotly.js": "2.6.0",
     "react-router-dom": "7.6.2"
   },
   "devDependencies": {

@@ -1,30 +1,38 @@
 .layout {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-}
-
-.layout-nav {
-  padding: 1rem;
-  margin-bottom: 2rem;
-  text-align: center;
-}
-
-.layout-nav a {
-  margin: 0 1rem;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  transition: background-color 0.3s;
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: none;
-}
-
-.layout-nav a:hover {
-  background-color: rgba(100, 108, 255, 0.1);
-  color: #535bf2;
+  width: 100%;
+  min-height: 100vh;
+  background: var(--color-background);
+  color: var(--color-text);
 }
 
 .layout-content {
-  min-height: calc(100vh - 120px);
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.05);
 }
