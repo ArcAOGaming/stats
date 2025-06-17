@@ -13,6 +13,19 @@ export interface YieldData {
 const FAIR_LAUNCH_PROCESSES = AUTONOMOUS_FINANCE.FAIR_LAUNCH_PROCESSES
 
 /**
+ * Format AO value with 2 decimal places and preserve whole numbers
+ * @param value The number to format
+ * @returns Formatted string with 2 decimal places
+ */
+export function formatAO(value: number): string {
+  // Convert to decimal (divide by 1e12)
+  const decimal = value / 1e12
+  
+  // Format with 2 decimal places
+  return `${decimal.toFixed(2)} AO`
+}
+
+/**
  * Transforms FLP yield history entries into a format suitable for plotting
  * @param entries The raw FLP yield history entries
  * @returns Array of transformed yield data points
@@ -25,15 +38,14 @@ export function transformYieldData(entries: FLPYieldHistoryEntry[]): YieldData[]
         .filter(([processId, yield_]) => {
           // Check if this process ID exists in any FLP entry
           const isValidYield = yield_ && !isNaN(parseFloat(yield_))
-          const isValidFLP = Object.values(FAIR_LAUNCH_PROCESSES).includes(processId)
-          return isValidYield && isValidFLP
+          return isValidYield
         })
         .map(([processId, yield_]) => ({
           timestamp: entry.timestamp * 1000,
           amount: parseFloat(yield_),
           processId,
-            name: Object.entries(FAIR_LAUNCH_PROCESSES)
-              .find(([name, id]) => id === processId)?.[0] || 'Unknown'
+          name: Object.entries(FAIR_LAUNCH_PROCESSES)
+            .find(([name, id]) => id === processId)?.[0] || 'Unknown'
         }))
         .value()
     })

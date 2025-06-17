@@ -3,7 +3,7 @@ import Plot from 'react-plotly.js'
 import './FLPYield.css'
 import { AUTONOMOUS_FINANCE } from 'ao-js-sdk/dist/src/process-ids/autonomous-finance'
 import { fetchFLPYieldHistory } from './flpYieldService'
-import { transformYieldData, groupDataByProcess, calculateStats, type YieldData } from './flpYieldUtils'
+import { transformYieldData, groupDataByProcess, calculateStats, formatAO, type YieldData } from './flpYieldUtils'
 import { colors, plotConfig, createPlotLayout } from './flpYieldConfig'
 
 // Get the FLP mapping directly from the SDK
@@ -59,7 +59,7 @@ function FLPYield() {
         symbol: 'circle',
         color: colors[colorIndex],
       },
-      hovertemplate: `${name}<br>%{y:.2f} AO<br>%{x|%Y-%m-%d}<extra></extra>`,
+      hovertemplate: `${name}<br>%{y:/1e12:.2f} AO<br>%{x|%Y-%m-%d}<extra></extra>`,
     }
 
     // For GAME and SMONEY, add a note in hover if no data
@@ -131,23 +131,23 @@ function FLPYield() {
                       <>
                         <div className="stat-row">
                           <span>Latest:</span>
-                          <span>{flpStats.latest.toFixed(2)} AO</span>
+                          <span>{formatAO(flpStats.latest)}</span>
                         </div>
                         <div className="stat-row">
                           <span>Average:</span>
-                          <span>{flpStats.avg.toFixed(2)} AO</span>
+                          <span>{formatAO(flpStats.avg)}</span>
                         </div>
                         <div className="stat-row">
                           <span>Total:</span>
-                          <span>{flpStats.total.toFixed(2)} AO</span>
+                          <span>{formatAO(flpStats.total)}</span>
                         </div>
                         <div className="stat-row">
                           <span>Min:</span>
-                          <span>{flpStats.min.toFixed(2)} AO</span>
+                          <span>{formatAO(flpStats.min)}</span>
                         </div>
                         <div className="stat-row">
                           <span>Max:</span>
-                          <span>{flpStats.max.toFixed(2)} AO</span>
+                          <span>{formatAO(flpStats.max)}</span>
                         </div>
                         <div className="stat-row">
                           <span>Data Points:</span>
