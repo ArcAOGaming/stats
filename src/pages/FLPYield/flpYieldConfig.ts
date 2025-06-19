@@ -22,12 +22,12 @@ export const plotConfig = {
 // Plot layout configuration
 export const createPlotLayout = () => ({
   title: {
-    text: 'Fair Launch Process Manual AO Yield',
+    text: '$GAME Fair Launch Process Yield',
     font: {
       size: 24,
       family: 'Inter, system-ui, sans-serif',
     },
-    y: 0.95,
+    y: 0.9, // Lower the title position to avoid overlap with legend
   },
   paper_bgcolor: 'rgba(0,0,0,0)',
   plot_bgcolor: 'rgba(0,0,0,0)',
@@ -65,21 +65,25 @@ export const createPlotLayout = () => ({
   legend: {
     bgcolor: 'rgba(0,0,0,0)',
     orientation: 'h',
-    yanchor: 'bottom',
-    y: -0.2,
+    yanchor: 'top',
+    y: 1.2, // Position the legend even higher above the plot
     xanchor: 'center',
     x: 0.5,
     font: {
       size: 12,
     },
     borderwidth: 0,
+    traceorder: 'normal',
+    xgap: 10, // Add horizontal gap between legend items
+    itemwidth: 80, // Control width of legend items
+    itemsizing: 'constant',
   },
   autosize: true,
   margin: {
     l: 50,
     r: 50,
-    b: 100,
-    t: 50,
+    b: 50,
+    t: 100, // Further increased top margin to accommodate both title and legend
     pad: 4,
   },
 })

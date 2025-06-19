@@ -23,10 +23,13 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   padding: clamp(1rem, 3vw, 2rem);
+  padding-top: clamp(3rem, 5vw, 4rem); /* Increased top padding for title and legend */
   backdrop-filter: blur(10px);
   box-shadow: 
     0 4px 24px -1px rgba(0, 0, 0, 0.1),
     0 0 1px 0 rgba(0, 0, 0, 0.05);
+  margin-top: 3rem; /* Add margin at the top for the legend */
+  position: relative;
 }
 
 .flp-yield-stats {
@@ -96,6 +99,16 @@
 .flp-yield-plot {
   width: 100% !important;
   height: clamp(400px, 60vh, 800px) !important;
+}
+
+/* Container for the plot to ensure it fits the content */
+.js-plotly-plot {
+  margin-top: 3rem; /* Increased space for the legend and title */
+}
+
+/* Ensure title doesn't overlap with legend */
+.g-gtitle {
+  transform: translateY(-20px); /* Move title down slightly */
 }
 
 .flp-yield-message {

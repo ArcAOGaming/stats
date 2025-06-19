@@ -115,7 +115,7 @@ function FLPYield() {
           style={{ width: '100%', height: '100%' }}
         />
         <div className="flp-yield-stats">
-          <h2>FLP Statistics</h2>
+          <h2>$GAME FLP Statistics</h2>
           <div className="stats-grid">
             {Object.entries(FAIR_LAUNCH_PROCESSES).map(([name, processId]) => {
               const flpStats = stats[processId] || { min: 0, max: 0, avg: 0, total: 0, count: 0, latest: 0 }
