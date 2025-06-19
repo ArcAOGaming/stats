@@ -4,8 +4,9 @@ import { Layout, Analytics, Loading, PasswordProtection } from './shared/compone
 import { createRoute } from './utils/routing'
 import Home from './pages/Home/Home'
 
-// Create route with automatic eager loading
+// Create routes with automatic eager loading
 const FLPYield = createRoute(() => import('./pages/FLPYield/FLPYield'))
+const Game = createRoute(() => import('./pages/Game/Game'))
 
 function App() {
   return (
@@ -15,8 +16,9 @@ function App() {
           <Layout>
             <Suspense fallback={<Loading />}>
               <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/flp-yield" element={<FLPYield />} />
+                <Route path="/" element={<Home />} />
+                <Route path="/flp-yield" element={<FLPYield />} />
+                <Route path="/game" element={<Game />} />
               </Routes>
             </Suspense>
           </Layout>

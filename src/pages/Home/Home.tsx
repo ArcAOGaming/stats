@@ -26,6 +26,17 @@ function Home() {
               <span className="card-action">View Dashboard</span>
             </div>
           </Link>
+          
+          <Link to="/game" className="card">
+            <div className="card-content">
+              <div className="card-icon">💰</div>
+              <h3>GAME Dashboard</h3>
+              <p>Track $GAME investment income and performance metrics</p>
+            </div>
+            <div className="card-footer">
+              <span className="card-action">View Dashboard</span>
+            </div>
+          </Link>
         </div>
       </section>
     </div>
