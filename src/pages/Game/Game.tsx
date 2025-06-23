@@ -1,20 +1,47 @@
 import { useEffect, useState } from 'react'
-import Plot from 'react-plotly.js'
 import './Game.css'
-import { fetchGameYieldHistory } from './gameService'
-import { transformGameYieldData, calculateGameStats, formatAO, type GameYieldData } from './gameUtils'
-import { colors, plotConfig, createPlotLayout } from './gameConfig'
+import { 
+  fetchGameYieldHistory, 
+  fetchGameFLPInfo, 
+  fetchGameCirculatingSupply,
+  fetchExcludedAmount,
+  fetchGameTokenInfo,
+  type GameTokenInfo
+} from './gameService'
+import { transformGameYieldData, type GameYieldData } from './gameUtils'
+import type { FairLaunchInfo } from 'ao-js-sdk/dist/src/clients/pi/fair-launch-process/types'
+import { FairLaunchGraph, Velocity } from './components'
+import BigNumber from 'bignumber.js'
+import { TokenInfo } from 'ao-js-sdk'
 
 function Game() {
   const [gameData, setGameData] = useState<GameYieldData[]>([])
+  const [flpInfo, setFlpInfo] = useState<FairLaunchInfo | null>(null)
+  const [tokenInfo, setTokenInfo] = useState<TokenInfo | null>(null)
+  const [circulatingSupply, setCirculatingSupply] = useState<BigNumber>(new BigNumber(0))
+  const [excludedAmount, setExcludedAmount] = useState<BigNumber>(new BigNumber(0))
+  const [excludedPercentage, setExcludedPercentage] = useState<number>(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const fetchData = async () => {
     try {
-      const entries = await fetchGameYieldHistory()
+      // Fetch yield history, FLP info, token info, circulating supply, and excluded amount in parallel
+      const [entries, info, token, supply, excluded] = await Promise.all([
+        fetchGameYieldHistory(),
+        fetchGameFLPInfo(),
+        fetchGameTokenInfo(),
+        fetchGameCirculatingSupply(),
+        fetchExcludedAmount()
+      ])
+      
       const transformedData = transformGameYieldData(entries)
       setGameData(transformedData)
+      setFlpInfo(info)
+      setTokenInfo(token)
+      setCirculatingSupply(supply)
+      setExcludedAmount(excluded.amount)
+      setExcludedPercentage(excluded.percentage)
       setLoading(false)
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to fetch GAME data'
@@ -26,50 +53,6 @@ function Game() {
   useEffect(() => {
     fetchData()
   }, [])
-
-  // Create plot data for GAME
-  const plotData = gameData.length > 0 ? [
-    {
-      x: gameData.map(d => new Date(d.timestamp)),
-      y: gameData.map(d => d.amount),
-      name: 'GAME Investment Income',
-      type: 'scatter',
-      mode: 'lines+markers',
-      line: {
-        width: 3,
-        shape: 'spline',
-        color: colors[0],
-      },
-      marker: {
-        size: 8,
-        symbol: 'circle',
-        color: colors[0],
-      },
-      hovertemplate: 'GAME<br>%{y:/1e12:.2f} AO<br>%{x|%Y-%m-%d}<extra></extra>',
-    }
-  ] : [
-    {
-      x: [new Date()],
-      y: [0],
-      name: 'GAME Investment Income',
-      type: 'scatter',
-      mode: 'lines+markers',
-      line: {
-        width: 3,
-        shape: 'spline',
-        color: colors[0],
-      },
-      marker: {
-        size: 8,
-        symbol: 'circle',
-        color: colors[0],
-      },
-      hovertemplate: 'GAME<br>No data available yet<extra></extra>',
-      visible: true,
-    }
-  ]
-
-  const layout = createPlotLayout()
 
   if (loading || error) {
     return (
@@ -100,62 +83,21 @@ function Game() {
     )
   }
 
-  const stats = calculateGameStats(gameData)
-
   return (
     <div className="game">
       <div className="game-container">
-        <Plot
-          data={plotData}
-          layout={layout}
-          config={{plotConfig,}}
-          useResizeHandler
-          className="game-plot"
-          style={{ width: '100%', height: '100%' }}
-
+        <FairLaunchGraph 
+          gameData={gameData}
+          flpInfo={flpInfo}
         />
-        <div className="game-stats">
-          <h2>$GAME Statistics</h2>
-          <div className="stats-grid">
-            <div className="stat-card">
-              <h3>Investment Income</h3>
-              <div className="stat-content">
-                {gameData.length === 0 ? (
-                  <div className="stat-row">
-                    <span className="no-data-message">No data available yet</span>
-                  </div>
-                ) : (
-                  <>
-                    <div className="stat-row">
-                      <span>Latest:</span>
-                      <span>{formatAO(stats.latest)}</span>
-                    </div>
-                    <div className="stat-row">
-                      <span>Average:</span>
-                      <span>{formatAO(stats.avg)}</span>
-                    </div>
-                    <div className="stat-row">
-                      <span>Total:</span>
-                      <span>{formatAO(stats.total)}</span>
-                    </div>
-                    <div className="stat-row">
-                      <span>Min:</span>
-                      <span>{formatAO(stats.min)}</span>
-                    </div>
-                    <div className="stat-row">
-                      <span>Max:</span>
-                      <span>{formatAO(stats.max)}</span>
-                    </div>
-                    <div className="stat-row">
-                      <span>Data Points:</span>
-                      <span>{stats.count}</span>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+        
+        <Velocity
+          tokenInfo={tokenInfo}
+          flpInfo={flpInfo}
+          circulatingSupply={circulatingSupply}
+          excludedAmount={excludedAmount}
+          excludedPercentage={excludedPercentage}
+        />
       </div>
     </div>
   )
