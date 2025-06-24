@@ -32,6 +32,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/ar\.io\/.*/i,
@@ -54,7 +55,10 @@ export default defineConfig({
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'analytics': ['react-ga4']
+          'analytics': ['react-ga4'],
+          'lodash': ['lodash'],
+          'plotly': ['plotly.js'],
+          'react-plotly': ['react-plotly.js']
         }
       }
     },
@@ -73,7 +77,7 @@ export default defineConfig({
     // Enable asset optimization
     assetsInlineLimit: 4096,
     // Reduce chunk size warnings
-    chunkSizeWarningLimit: 1000
+    chunkSizeWarningLimit: 4000 // Increased to 4MB to accommodate large dependencies
   },
   // Enable SWC minification
   esbuild: {
