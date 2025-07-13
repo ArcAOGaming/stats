@@ -77,6 +77,7 @@ export function transformYieldData(entries: FLPYieldHistoryEntry[]): YieldData[]
 export function transformGameYieldData(entries: FLPYieldHistoryEntry[]): YieldData[] {
   return _(entries)
     .flatMap(entry => {
+      if (!entry.timestamp || entry.timestamp < 1735689600) return []
       return _(entry.projectYields || {})
         .entries()
         .filter(([processId, yield_]) => {

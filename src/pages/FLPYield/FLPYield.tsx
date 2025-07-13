@@ -39,7 +39,7 @@ function FLPYield() {
     // Ensure we have a valid color index by using modulo
     const colorIndex = index % colors.length
     const processData = (dataByProcess[processId] || [])
-      .filter(d => d.amount > 0) // Only show positive yields
+      .filter(d => d.amount > 0 && d.timestamp >= 1735689600) // Only show positive yields
       .sort((a, b) => a.timestamp - b.timestamp)
     
     // Create base plot item
