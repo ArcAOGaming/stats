@@ -2,6 +2,7 @@ import { PiDataService } from 'ao-js-sdk/dist/src/services/autonomous-finance/pi
 import type { FLPYieldHistoryEntry } from 'ao-js-sdk/dist/src/services/autonomous-finance/pi-data-service/abstract/responses'
 import { lastValueFrom } from 'rxjs'
 import { AUTONOMOUS_FINANCE } from 'ao-js-sdk/dist/src/process-ids/autonomous-finance'
+import { MIN_VALID_TIMESTAMP } from '../../constants'
 import _ from 'lodash'
 
 // Export the FLP mapping directly from the SDK
@@ -77,7 +78,7 @@ export function transformYieldData(entries: FLPYieldHistoryEntry[]): YieldData[]
 export function transformGameYieldData(entries: FLPYieldHistoryEntry[]): YieldData[] {
   return _(entries)
     .flatMap(entry => {
-      if (!entry.timestamp || entry.timestamp < 1735689600) return []
+      if (!entry.timestamp || entry.timestamp < MIN_VALID_TIMESTAMP) return []
       return _(entry.projectYields || {})
         .entries()
         .filter(([processId, yield_]) => {

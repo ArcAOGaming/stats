@@ -5,6 +5,7 @@ import { AUTONOMOUS_FINANCE } from 'ao-js-sdk/dist/src/process-ids/autonomous-fi
 import { fetchFLPYieldHistory } from './flpYieldService'
 import { transformYieldData, groupDataByProcess, calculateStats, formatAO, type YieldData } from './flpYieldUtils'
 import { colors, plotConfig, createPlotLayout } from './flpYieldConfig'
+import { MIN_VALID_TIMESTAMP } from '../../constants'
 
 // Get the FLP mapping directly from the SDK
 const FAIR_LAUNCH_PROCESSES = AUTONOMOUS_FINANCE.FAIR_LAUNCH_PROCESSES
@@ -39,7 +40,7 @@ function FLPYield() {
     // Ensure we have a valid color index by using modulo
     const colorIndex = index % colors.length
     const processData = (dataByProcess[processId] || [])
-      .filter(d => d.amount > 0 && d.timestamp >= 1735689600) // Only show positive yields
+      .filter(d => d.amount > 0 && d.timestamp >= MIN_VALID_TIMESTAMP) // Only show positive yields
       .sort((a, b) => a.timestamp - b.timestamp)
     
     // Create base plot item
