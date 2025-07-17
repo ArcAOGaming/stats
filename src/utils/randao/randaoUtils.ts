@@ -8,6 +8,8 @@ export interface RANDAODataPoint {
     quantity: number
     blockTimeStamp: number
     id: string
+    recipient: string,
+    sender: string
 }
 
 /**
@@ -33,6 +35,7 @@ export interface RANDAOStats {
     latestTimestamp: number | null
     mrr: number // Monthly Recurring Revenue in AO
     arr: number // Annual Recurring Revenue in AO
+    uniqueClients: number // Number of unique recipients
 }
 
 /**
@@ -52,7 +55,9 @@ export function transformCreditNoticeToDataPoint(creditNotice: CreditNotice): RA
         timestamp: creditNotice.blockTimeStamp * 1000, // Convert to milliseconds
         quantity,
         blockTimeStamp: creditNotice.blockTimeStamp,
-        id: creditNotice.id
+        id: creditNotice.id,
+        recipient: creditNotice.recipient,
+        sender: creditNotice.sender
     }
 }
 
@@ -111,7 +116,8 @@ export function calculateRANDAOStats(dataPoints: RANDAODataPoint[]): RANDAOStats
             firstTimestamp: null,
             latestTimestamp: null,
             mrr: 0,
-            arr: 0
+            arr: 0,
+            uniqueClients: 0
         }
     }
 
@@ -135,6 +141,10 @@ export function calculateRANDAOStats(dataPoints: RANDAODataPoint[]): RANDAOStats
     const mrr = dailyRevenue * 30 // Monthly Recurring Revenue
     const arr = dailyRevenue * 365 // Annual Recurring Revenue
 
+    // Calculate unique clients
+    const uniqueRecipients = new Set(dataPoints.map(d => d.sender))
+    const uniqueClients = uniqueRecipients.size
+
     return {
         totalQuantity,
         totalTransactions: dataPoints.length,
@@ -145,7 +155,8 @@ export function calculateRANDAOStats(dataPoints: RANDAODataPoint[]): RANDAOStats
         firstTimestamp,
         latestTimestamp,
         mrr,
-        arr
+        arr,
+        uniqueClients
     }
 }
 

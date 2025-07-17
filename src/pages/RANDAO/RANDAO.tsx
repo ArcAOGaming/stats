@@ -290,6 +290,14 @@ function RANDAO() {
                                     <span>{stats.arr.toFixed(2)} AO</span>
                                 </div>
                             </div>
+
+                            <div className="stat-card">
+                                <h3>Clients</h3>
+                                <div className="stat-row">
+                                    <span>Unique:</span>
+                                    <span>{stats.uniqueClients}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 )}
