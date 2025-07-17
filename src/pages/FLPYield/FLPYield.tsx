@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
 import Plot from 'react-plotly.js'
 import './FLPYield.css'
-import { AUTONOMOUS_FINANCE } from 'ao-js-sdk/dist/src/process-ids/autonomous-finance'
 import { fetchFLPYieldHistory } from './flpYieldService'
 import { transformYieldData, groupDataByProcess, calculateStats, formatAO, type YieldData } from './flpYieldUtils'
 import { colors, plotConfig, createPlotLayout } from './flpYieldConfig'
 import { MIN_VALID_TIMESTAMP } from '../../constants'
+import { PROCESS_IDS } from 'ao-js-sdk'
 
 // Get the FLP mapping directly from the SDK
-const FAIR_LAUNCH_PROCESSES = AUTONOMOUS_FINANCE.FAIR_LAUNCH_PROCESSES
+const FAIR_LAUNCH_PROCESSES = PROCESS_IDS.AUTONOMOUS_FINANCE.FAIR_LAUNCH_PROCESSES
 
 function FLPYield() {
   const [yieldData, setYieldData] = useState<YieldData[]>([])
@@ -34,7 +34,7 @@ function FLPYield() {
   }, []) // No dependencies since fetchData is now defined inside component
 
   const dataByProcess = groupDataByProcess(yieldData)
-  
+
   // Create plot data for each FLP
   const plotData = Object.entries(FAIR_LAUNCH_PROCESSES).map(([name, processId], index) => {
     // Ensure we have a valid color index by using modulo
@@ -42,7 +42,7 @@ function FLPYield() {
     const processData = (dataByProcess[processId] || [])
       .filter(d => d.amount > 0 && d.timestamp >= MIN_VALID_TIMESTAMP) // Only show positive yields
       .sort((a, b) => a.timestamp - b.timestamp)
-    
+
     // Create base plot item
     const plotItem = {
       x: processData.map(d => new Date(d.timestamp)),
@@ -85,7 +85,7 @@ function FLPYield() {
           ) : (
             <div className="error-message">
               {error}
-              <button 
+              <button
                 onClick={() => {
                   setError(null)
                   setLoading(true)
