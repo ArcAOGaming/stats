@@ -1,4 +1,4 @@
-import { AUTONOMOUS_FINANCE } from 'ao-js-sdk/dist/src/process-ids/autonomous-finance'
+import { PROCESS_IDS } from 'ao-js-sdk'
 import type { FLPYieldHistoryEntry } from 'ao-js-sdk/dist/src/services/autonomous-finance/pi-data-service/abstract/responses'
 import _ from 'lodash'
 
@@ -10,7 +10,7 @@ export interface YieldData {
 }
 
 // Get the FLP mapping directly from the SDK
-const FAIR_LAUNCH_PROCESSES = AUTONOMOUS_FINANCE.FAIR_LAUNCH_PROCESSES
+const FAIR_LAUNCH_PROCESSES = PROCESS_IDS.AUTONOMOUS_FINANCE.FAIR_LAUNCH_PROCESSES
 
 /**
  * Format AO value with 2 decimal places and preserve whole numbers
@@ -20,7 +20,7 @@ const FAIR_LAUNCH_PROCESSES = AUTONOMOUS_FINANCE.FAIR_LAUNCH_PROCESSES
 export function formatAO(value: number): string {
   // Convert to decimal (divide by 1e12)
   const decimal = value / 1e12
-  
+
   // Format with 2 decimal places
   return `${decimal.toFixed(2)} AO`
 }
@@ -61,7 +61,7 @@ export function transformYieldData(entries: FLPYieldHistoryEntry[]): YieldData[]
 export function groupDataByProcess(data: YieldData[]): Record<string, YieldData[]> {
   return _(data)
     .groupBy('processId')
-    .mapValues(group => 
+    .mapValues(group =>
       _(group)
         .orderBy(['timestamp'], ['asc'])
         .filter(d => d.amount > 0)

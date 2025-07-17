@@ -1,12 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { PiDataService } from 'ao-js-sdk/dist/src/services/autonomous-finance/pi-data-service/PiDataService'
 import type { FLPYieldHistoryEntry } from 'ao-js-sdk/dist/src/services/autonomous-finance/pi-data-service/abstract/responses'
 import { lastValueFrom } from 'rxjs'
-import { AUTONOMOUS_FINANCE } from 'ao-js-sdk/dist/src/process-ids/autonomous-finance'
 import { MIN_VALID_TIMESTAMP } from '../../constants'
 import _ from 'lodash'
+import { PROCESS_IDS } from 'ao-js-sdk'
 
 // Export the FLP mapping directly from the SDK
-export const FAIR_LAUNCH_PROCESSES = AUTONOMOUS_FINANCE.FAIR_LAUNCH_PROCESSES
+export const FAIR_LAUNCH_PROCESSES = PROCESS_IDS.AUTONOMOUS_FINANCE.FAIR_LAUNCH_PROCESSES
 
 // Find the GAME process ID
 export const GAME_PROCESS_ID = Object.entries(FAIR_LAUNCH_PROCESSES)
@@ -29,7 +30,7 @@ export async function fetchFLPYieldHistory(): Promise<FLPYieldHistoryEntry[]> {
 export function formatAO(value: number): string {
   // Convert to decimal (divide by 1e12)
   const decimal = value / 1e12
-  
+
   // Format with 2 decimal places
   return `${decimal.toFixed(2)} AO`
 }
@@ -107,7 +108,7 @@ export function transformGameYieldData(entries: FLPYieldHistoryEntry[]): YieldDa
 export function groupDataByProcess(data: YieldData[]): Record<string, YieldData[]> {
   return _(data)
     .groupBy('processId')
-    .mapValues(group => 
+    .mapValues(group =>
       _(group)
         .orderBy(['timestamp'], ['asc'])
         .filter(d => d.amount > 0)
@@ -147,7 +148,7 @@ export function calculateGameStats(data: YieldData[]) {
       latest: 0
     }
   }
-  
+
   return {
     min: _.minBy(data, 'amount')?.amount || 0,
     max: _.maxBy(data, 'amount')?.amount || 0,
