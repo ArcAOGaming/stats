@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { PiDataService } from 'ao-js-sdk/dist/src/services/autonomous-finance/pi-data-service/PiDataService'
 import type { FLPYieldHistoryEntry } from 'ao-js-sdk/dist/src/services/autonomous-finance/pi-data-service/abstract/responses'
-import { lastValueFrom } from 'rxjs'
+import { firstValueFrom, lastValueFrom, scan, takeLast } from 'rxjs'
 import { MIN_VALID_TIMESTAMP } from '../../constants'
 import _ from 'lodash'
 import { PROCESS_IDS } from 'ao-js-sdk'
@@ -15,12 +15,24 @@ export const GAME_PROCESS_ID = Object.entries(FAIR_LAUNCH_PROCESSES)
 
 /**
  * Fetches the latest FLP yield history data
- * @returns Promise that resolves with the latest FLP yield history entries
+ * @returns Promise that resolves with all aggregated FLP yield history entries
  */
 export async function fetchFLPYieldHistory(): Promise<FLPYieldHistoryEntry[]> {
   const service = PiDataService.autoConfiguration()
-  return await lastValueFrom(service.getFLPYieldHistory())
+  const observableHistory = service.getFLPYieldHistory()
+
+  // Aggregate all emitted values into a single array
+  const aggregatedHistory = observableHistory.pipe(
+    scan((accumulator: FLPYieldHistoryEntry[], currentHistory: FLPYieldHistoryEntry[]) => {
+      return [...accumulator, ...currentHistory]
+    }, []),
+    takeLast(1) // Take the final aggregated result
+  )
+
+  const history = await firstValueFrom(aggregatedHistory)
+  return history
 }
+
 
 /**
  * Format AO value with 2 decimal places and preserve whole numbers
