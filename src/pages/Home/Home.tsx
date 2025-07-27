@@ -7,9 +7,9 @@ function Home() {
     <div className="home">
       <section className="hero-section">
         <div className="hero-content">
-          <h1>$GAME Stats</h1>
+          <h1>CipherPlay Stats</h1>
           <p className="hero-description">
-            Real-time analytics and yield tracking for Fair Launch Processes
+            Real-time analytics for CipherPlay & its products
           </p>
         </div>
       </section>

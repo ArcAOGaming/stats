@@ -14,7 +14,7 @@
   "dependencies": {
     "@permaweb/aoconnect": "0.0.77",
     "@types/plotly.js": "3.0.0",
-    "ao-js-sdk": "0.0.14",
+    "ao-js-sdk": "0.2.3",
     "plotly.js": "3.0.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
