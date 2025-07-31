@@ -33,6 +33,51 @@
     font-size: 1.1rem;
 }
 
+.graph-selector {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: var(--color-background-alt);
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+}
+
+.graph-selector label {
+    color: var(--color-text);
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+.graph-dropdown {
+    background: var(--color-background);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+    min-width: 200px;
+}
+
+.graph-dropdown:hover {
+    border-color: var(--color-primary);
+}
+
+.graph-dropdown:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2);
+}
+
+.graph-dropdown option {
+    background: var(--color-background);
+    color: var(--color-text);
+    padding: 0.5rem;
+}
+
 .randao-plot {
     flex: 1;
     min-height: 500px;
