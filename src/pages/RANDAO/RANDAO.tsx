@@ -14,13 +14,23 @@ import {
 } from '../../utils/randao'
 import { Subscription } from 'rxjs'
 
+type GraphType = 'aggregate' | 'monthly'
+
+interface MonthlyData {
+    month: string
+    quantity: number
+    count: number
+}
+
 function RANDAO() {
     const [dataPoints, setDataPoints] = useState<RANDAODataPoint[]>([])
     const [aggregatedData, setAggregatedData] = useState<AggregatedRANDAOData[]>([])
+    const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([])
     const [stats, setStats] = useState<RANDAOStats | null>(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [isConnected, setIsConnected] = useState(false)
+    const [selectedGraph, setSelectedGraph] = useState<GraphType>('aggregate')
     const subscriptionRef = useRef<Subscription | null>(null)
 
     useEffect(() => {
@@ -74,11 +84,40 @@ function RANDAO() {
         }
     }, [])
 
+    // Function to aggregate data by month
+    const aggregateDataByMonth = (dataPoints: RANDAODataPoint[]): MonthlyData[] => {
+        if (dataPoints.length === 0) return []
+
+        const monthlyMap = new Map<string, { quantity: number; count: number }>()
+
+        for (const point of dataPoints) {
+            const date = new Date(point.timestamp)
+            const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+
+            if (!monthlyMap.has(monthKey)) {
+                monthlyMap.set(monthKey, { quantity: 0, count: 0 })
+            }
+
+            const current = monthlyMap.get(monthKey)!
+            current.quantity += point.quantity
+            current.count += 1
+        }
+
+        return Array.from(monthlyMap.entries())
+            .map(([month, data]) => ({
+                month,
+                quantity: data.quantity,
+                count: data.count
+            }))
+            .sort((a, b) => a.month.localeCompare(b.month))
+    }
+
     // Update aggregated data and stats when dataPoints change
     useEffect(() => {
         if (dataPoints.length > 0) {
             const aggregated = aggregateDataByTime(dataPoints, 3600000) // 1 hour intervals
             setAggregatedData(aggregated)
+            setMonthlyData(aggregateDataByMonth(dataPoints))
             setStats(calculateRANDAOStats(dataPoints))
         }
     }, [dataPoints])
@@ -132,49 +171,101 @@ function RANDAO() {
         startStream()
     }
 
-    // Create plot data
-    const plotData = aggregatedData.length > 0 ? [{
-        x: aggregatedData.map(d => new Date(d.timestamp)),
-        y: aggregatedData.map(d => d.cumulativeQuantity),
-        name: 'Cumulative RNG Sales',
-        type: 'scatter' as const,
-        mode: 'lines+markers' as const,
-        line: {
-            width: 3,
-            shape: 'spline' as const,
-            color: '#4a9eff',
-        },
-        marker: {
-            size: 8,
-            symbol: 'circle' as const,
-            color: '#4a9eff',
-        },
-        hovertemplate: `%{y} total quantity<br>%{x|%Y-%m-%d %H:%M}<extra></extra>`,
-    }] : []
-
-    const layout = {
-        title: {
-            text: 'RANDAO RNG Faucet Sales Over Time',
-            font: { color: '#4a9eff', size: 20 }
-        },
-        xaxis: {
-            title: 'Time',
-            color: 'rgba(255, 255, 255, 0.7)',
-            gridcolor: 'rgba(255, 255, 255, 0.1)',
-            type: 'date' as const
-        },
-        yaxis: {
-            title: 'Cumulative Quantity',
-            color: 'rgba(255, 255, 255, 0.7)',
-            gridcolor: 'rgba(255, 255, 255, 0.1)',
-        },
-        plot_bgcolor: 'transparent',
-        paper_bgcolor: 'transparent',
-        font: { color: 'rgba(255, 255, 255, 0.95)' },
-        margin: { t: 80, r: 40, b: 60, l: 80 },
-        showlegend: false,
-        autosize: true
+    // Create plot data based on selected graph type
+    const getPlotData = () => {
+        if (selectedGraph === 'aggregate' && aggregatedData.length > 0) {
+            return [{
+                x: aggregatedData.map(d => new Date(d.timestamp)),
+                y: aggregatedData.map(d => d.cumulativeQuantity),
+                name: 'Cumulative RNG Sales',
+                type: 'scatter' as const,
+                mode: 'lines+markers' as const,
+                line: {
+                    width: 3,
+                    shape: 'spline' as const,
+                    color: '#4a9eff',
+                },
+                marker: {
+                    size: 8,
+                    symbol: 'circle' as const,
+                    color: '#4a9eff',
+                },
+                hovertemplate: `%{y} total quantity<br>%{x|%Y-%m-%d %H:%M}<extra></extra>`,
+            }]
+        } else if (selectedGraph === 'monthly' && monthlyData.length > 0) {
+            return [{
+                x: monthlyData.map(d => d.month),
+                y: monthlyData.map(d => d.count),
+                name: 'Monthly RNG Sales',
+                type: 'bar' as const,
+                marker: {
+                    color: '#4a9eff',
+                    opacity: 0.8,
+                },
+                customdata: monthlyData.map(d => d.quantity),
+                hovertemplate: `%{y} transactions<br>%{x}<br>Total Quantity: %{customdata}<extra></extra>`,
+            }]
+        }
+        return []
     }
+
+    const getLayout = () => {
+        const baseLayout = {
+            plot_bgcolor: 'transparent',
+            paper_bgcolor: 'transparent',
+            font: { color: 'rgba(255, 255, 255, 0.95)' },
+            margin: { t: 80, r: 40, b: 60, l: 80 },
+            showlegend: false,
+            autosize: true,
+            xaxis: {
+                color: 'rgba(255, 255, 255, 0.7)',
+                gridcolor: 'rgba(255, 255, 255, 0.1)',
+            },
+            yaxis: {
+                color: 'rgba(255, 255, 255, 0.7)',
+                gridcolor: 'rgba(255, 255, 255, 0.1)',
+            }
+        }
+
+        if (selectedGraph === 'aggregate') {
+            return {
+                ...baseLayout,
+                title: {
+                    text: 'Aggregate Sales Over Time',
+                    font: { color: '#4a9eff', size: 20 }
+                },
+                xaxis: {
+                    ...baseLayout.xaxis,
+                    title: 'Time',
+                    type: 'date' as const
+                },
+                yaxis: {
+                    ...baseLayout.yaxis,
+                    title: 'Cumulative Quantity',
+                }
+            }
+        } else {
+            return {
+                ...baseLayout,
+                title: {
+                    text: 'Monthly Sales',
+                    font: { color: '#4a9eff', size: 20 }
+                },
+                xaxis: {
+                    ...baseLayout.xaxis,
+                    title: 'Month',
+                    type: 'category' as const
+                },
+                yaxis: {
+                    ...baseLayout.yaxis,
+                    title: 'Number of Transactions',
+                }
+            }
+        }
+    }
+
+    const plotData = getPlotData()
+    const layout = getLayout()
 
     const config = {
         responsive: true,
@@ -217,6 +308,19 @@ function RANDAO() {
                             <span>Live Data Stream</span>
                         </div>
                     )}
+                </div>
+
+                <div className="graph-selector">
+                    <label htmlFor="graph-type">Graph Type:</label>
+                    <select
+                        id="graph-type"
+                        value={selectedGraph}
+                        onChange={(e) => setSelectedGraph(e.target.value as GraphType)}
+                        className="graph-dropdown"
+                    >
+                        <option value="aggregate">Aggregate Sales Over Time</option>
+                        <option value="monthly">Monthly Sales</option>
+                    </select>
                 </div>
 
                 <div className="randao-plot">
