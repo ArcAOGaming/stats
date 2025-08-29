@@ -8,6 +8,7 @@ import Home from './pages/Home/Home'
 const FLPYield = createRoute(() => import('./pages/FLPYield/FLPYield'))
 const Game = createRoute(() => import('./pages/Game/Game'))
 const RANDAO = createRoute(() => import('./pages/RANDAO/RANDAO'))
+const PI = createRoute(() => import('./pages/PI/PI'))
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
                 <Route path="/flp-yield" element={<FLPYield />} />
                 <Route path="/game" element={<Game />} />
                 <Route path="/randao" element={<RANDAO />} />
+                <Route path="/pi" element={<PI />} />
               </Routes>
             </Suspense>
           </Layout>

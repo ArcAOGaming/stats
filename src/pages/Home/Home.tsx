@@ -48,6 +48,17 @@ function Home() {
               <span className="card-action">View Dashboard</span>
             </div>
           </Link>
+
+          <Link to="/pi" className="card">
+            <div className="card-content">
+              <div className="card-icon">π</div>
+              <h3>PI Dashboard</h3>
+              <p>PI delegation preferences, mint reports, and network analytics from the AO network</p>
+            </div>
+            <div className="card-footer">
+              <span className="card-action">View Dashboard</span>
+            </div>
+          </Link>
         </div>
       </section>
     </div>
