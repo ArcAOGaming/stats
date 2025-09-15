@@ -1,12 +1,77 @@
-import { useState } from 'react'
 import Plot from 'react-plotly.js'
 import type { FairLaunchInfo } from 'ao-js-sdk/dist/src/clients/pi/fair-launch-process/types'
 import { formatAO, calculateGameStats, type GameYieldData } from '../gameUtils'
 import { colors, plotConfig, createPlotLayout } from '../gameConfig'
+import { FLPDataProvider, useFLPDataContext } from '../../../shared/context'
+import { PROCESS_IDS } from 'ao-js-sdk'
 
 interface FairLaunchGraphProps {
   gameData: GameYieldData[]
   flpInfo: FairLaunchInfo | null
+}
+
+function FLPInfoCard({ flpInfo }: { flpInfo: FairLaunchInfo | null }) {
+  const { numDelegators, loading: delegatorsLoading } = useFLPDataContext()
+
+  return (
+    <div className="stat-card">
+      <h3>FLP Information</h3>
+      <div className="stat-content">
+        {!flpInfo ? (
+          <div className="stat-row">
+            <span className="no-data-message">No FLP info available yet</span>
+          </div>
+        ) : (
+          <>
+            <div className="stat-row">
+              <span>Name:</span>
+              <span>{flpInfo.flpName}</span>
+            </div>
+            <div className="stat-row">
+              <span>Status:</span>
+              <span>{flpInfo.status}</span>
+            </div>
+            <div className="stat-row">
+              <span>Token:</span>
+              <span>{flpInfo.tokenName} ({flpInfo.tokenTicker})</span>
+            </div>
+            <div className="stat-row">
+              <span>Started:</span>
+              <span>{new Date(parseInt(flpInfo.startsAtTimestamp) * 1000).toLocaleDateString()}</span>
+            </div>
+            {flpInfo.endsAtTimestamp && (
+              <div className="stat-row">
+                <span>Ends:</span>
+                <span>{new Date(parseInt(flpInfo.endsAtTimestamp) * 1000).toLocaleDateString()}</span>
+              </div>
+            )}
+            <div className="stat-row">
+              <span>Distribution Tick:</span>
+              <span>{flpInfo.distributionTick} / {flpInfo.totalDistributionTicks}</span>
+            </div>
+            <div className="stat-row">
+              <span>Distributed:</span>
+              <span>{formatAO(parseFloat(flpInfo.distributedQuantity))}</span>
+            </div>
+            <div className="stat-row">
+              <span>Accumulated:</span>
+              <span>{formatAO(parseFloat(flpInfo.accumulatedQuantity))}</span>
+            </div>
+            <div className="stat-row">
+              <span>Withdrawn:</span>
+              <span>{formatAO(parseFloat(flpInfo.withdrawnQuantity))}</span>
+            </div>
+          </>
+        )}
+        <div className="stat-row">
+          <span>Delegators:</span>
+          <span>
+            {delegatorsLoading ? 'Loading...' : (numDelegators ?? 'N/A')}
+          </span>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 function FairLaunchGraph({ gameData, flpInfo }: FairLaunchGraphProps) {
@@ -61,7 +126,7 @@ function FairLaunchGraph({ gameData, flpInfo }: FairLaunchGraphProps) {
       <Plot
         data={plotData}
         layout={layout}
-        config={{plotConfig,}}
+        config={{ plotConfig, }}
         useResizeHandler
         className="game-plot"
         style={{ width: '100%', height: '100%' }}
@@ -104,58 +169,10 @@ function FairLaunchGraph({ gameData, flpInfo }: FairLaunchGraphProps) {
             )}
           </div>
         </div>
-        
-        <div className="stat-card">
-          <h3>FLP Information</h3>
-          <div className="stat-content">
-            {!flpInfo ? (
-              <div className="stat-row">
-                <span className="no-data-message">No FLP info available yet</span>
-              </div>
-            ) : (
-              <>
-                <div className="stat-row">
-                  <span>Name:</span>
-                  <span>{flpInfo.flpName}</span>
-                </div>
-                <div className="stat-row">
-                  <span>Status:</span>
-                  <span>{flpInfo.status}</span>
-                </div>
-                <div className="stat-row">
-                  <span>Token:</span>
-                  <span>{flpInfo.tokenName} ({flpInfo.tokenTicker})</span>
-                </div>
-                <div className="stat-row">
-                  <span>Started:</span>
-                  <span>{new Date(parseInt(flpInfo.startsAtTimestamp) * 1000).toLocaleDateString()}</span>
-                </div>
-                {flpInfo.endsAtTimestamp && (
-                  <div className="stat-row">
-                    <span>Ends:</span>
-                    <span>{new Date(parseInt(flpInfo.endsAtTimestamp) * 1000).toLocaleDateString()}</span>
-                  </div>
-                )}
-                <div className="stat-row">
-                  <span>Distribution Tick:</span>
-                  <span>{flpInfo.distributionTick} / {flpInfo.totalDistributionTicks}</span>
-                </div>
-                <div className="stat-row">
-                  <span>Distributed:</span>
-                  <span>{formatAO(parseFloat(flpInfo.distributedQuantity))}</span>
-                </div>
-                <div className="stat-row">
-                  <span>Accumulated:</span>
-                  <span>{formatAO(parseFloat(flpInfo.accumulatedQuantity))}</span>
-                </div>
-                <div className="stat-row">
-                  <span>Withdrawn:</span>
-                  <span>{formatAO(parseFloat(flpInfo.withdrawnQuantity))}</span>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
+
+        <FLPDataProvider processId={PROCESS_IDS.AUTONOMOUS_FINANCE.FAIR_LAUNCH_PROCESSES.GAME}>
+          <FLPInfoCard flpInfo={flpInfo} />
+        </FLPDataProvider>
       </div>
     </div>
   )
