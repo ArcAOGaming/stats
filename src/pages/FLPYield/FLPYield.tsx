@@ -6,9 +6,76 @@ import { transformYieldData, groupDataByProcess, calculateStats, formatAO, type 
 import { colors, plotConfig, createPlotLayout } from './flpYieldConfig'
 import { MIN_VALID_TIMESTAMP } from '../../constants'
 import { PROCESS_IDS } from 'ao-js-sdk'
+import { FLPDataProvider, useFLPDataContext } from '../../shared/context'
 
 // Get the FLP mapping directly from the SDK
 const FAIR_LAUNCH_PROCESSES = PROCESS_IDS.AUTONOMOUS_FINANCE.FAIR_LAUNCH_PROCESSES
+
+function StatCard({ name, processId, flpStats }: {
+  name: string,
+  processId: string,
+  flpStats: { min: number, max: number, avg: number, total: number, count: number, latest: number }
+}) {
+  return (
+    <FLPDataProvider processId={processId}>
+      <StatCardContent name={name} processId={processId} flpStats={flpStats} />
+    </FLPDataProvider>
+  )
+}
+
+function StatCardContent({ name, processId, flpStats }: {
+  name: string,
+  processId: string,
+  flpStats: { min: number, max: number, avg: number, total: number, count: number, latest: number }
+}) {
+  const { numDelegators, loading: delegatorsLoading } = useFLPDataContext()
+
+  return (
+    <div key={processId} className="stat-card">
+      <h3>{name}</h3>
+      <div className="stat-content">
+        {(name === 'GAME' || name === 'SMONEY') && flpStats.count === 0 ? (
+          <div className="stat-row">
+            <span className="no-data-message">No data available yet</span>
+          </div>
+        ) : (
+          <>
+            <div className="stat-row">
+              <span>Latest:</span>
+              <span>{formatAO(flpStats.latest)}</span>
+            </div>
+            <div className="stat-row">
+              <span>Average:</span>
+              <span>{formatAO(flpStats.avg)}</span>
+            </div>
+            <div className="stat-row">
+              <span>Total:</span>
+              <span>{formatAO(flpStats.total)}</span>
+            </div>
+            <div className="stat-row">
+              <span>Min:</span>
+              <span>{formatAO(flpStats.min)}</span>
+            </div>
+            <div className="stat-row">
+              <span>Max:</span>
+              <span>{formatAO(flpStats.max)}</span>
+            </div>
+            <div className="stat-row">
+              <span>Data Points:</span>
+              <span>{flpStats.count}</span>
+            </div>
+          </>
+        )}
+        <div className="stat-row">
+          <span>Delegators:</span>
+          <span>
+            {delegatorsLoading ? 'Loading...' : (numDelegators ?? 'N/A')}
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 function FLPYield() {
   const [yieldData, setYieldData] = useState<YieldData[]>([])
@@ -121,43 +188,12 @@ function FLPYield() {
             {Object.entries(FAIR_LAUNCH_PROCESSES).map(([name, processId]) => {
               const flpStats = stats[processId] || { min: 0, max: 0, avg: 0, total: 0, count: 0, latest: 0 }
               return (
-                <div key={processId} className="stat-card">
-                  <h3>{name}</h3>
-                  <div className="stat-content">
-                    {(name === 'GAME' || name === 'SMONEY') && flpStats.count === 0 ? (
-                      <div className="stat-row">
-                        <span className="no-data-message">No data available yet</span>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="stat-row">
-                          <span>Latest:</span>
-                          <span>{formatAO(flpStats.latest)}</span>
-                        </div>
-                        <div className="stat-row">
-                          <span>Average:</span>
-                          <span>{formatAO(flpStats.avg)}</span>
-                        </div>
-                        <div className="stat-row">
-                          <span>Total:</span>
-                          <span>{formatAO(flpStats.total)}</span>
-                        </div>
-                        <div className="stat-row">
-                          <span>Min:</span>
-                          <span>{formatAO(flpStats.min)}</span>
-                        </div>
-                        <div className="stat-row">
-                          <span>Max:</span>
-                          <span>{formatAO(flpStats.max)}</span>
-                        </div>
-                        <div className="stat-row">
-                          <span>Data Points:</span>
-                          <span>{flpStats.count}</span>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
+                <StatCard
+                  key={processId}
+                  name={name}
+                  processId={processId}
+                  flpStats={flpStats}
+                />
               )
             })}
           </div>
