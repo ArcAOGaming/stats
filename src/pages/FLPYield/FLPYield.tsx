@@ -7,6 +7,7 @@ import { colors, plotConfig, createPlotLayout } from './flpYieldConfig'
 import { MIN_VALID_TIMESTAMP } from '../../constants'
 import { PROCESS_IDS } from 'ao-js-sdk'
 import { FLPDataProvider, useFLPDataContext } from '../../shared/context'
+import DelegationPieChart from './components/DelegationPieChart'
 
 // Get the FLP mapping directly from the SDK
 const FAIR_LAUNCH_PROCESSES = PROCESS_IDS.AUTONOMOUS_FINANCE.FAIR_LAUNCH_PROCESSES
@@ -198,6 +199,7 @@ function FLPYield() {
             })}
           </div>
         </div>
+        <DelegationPieChart yieldData={yieldData} stats={stats} />
       </div>
     </div>
   )
