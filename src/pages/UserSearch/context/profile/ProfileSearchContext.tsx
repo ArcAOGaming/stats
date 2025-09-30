@@ -1,9 +1,9 @@
 import { useState, useCallback, ReactNode } from 'react'
-import { searchProfilesByWallet, type ProfileRegistryEntry } from '../../utils/profile/profileService'
+import { searchProfilesByWallet, type ProfileInfo } from '../../utils/profile/profileService'
 import { ProfileSearchContext, type ProfileSearchContextType } from './createProfileSearchContext'
 
 interface ProfileSearchState {
-    profiles: ProfileRegistryEntry[]
+    profiles: ProfileInfo[]
     loading: boolean
     error: string | null
 }

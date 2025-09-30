@@ -52,21 +52,41 @@
     margin-bottom: 0.75rem;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    gap: 1rem;
 }
 
 .project-name {
     font-size: 1.1rem;
     font-weight: 600;
     color: var(--color-primary);
+    flex: 1;
 }
 
-.percentage {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--color-accent);
+.ao-link-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
     background: rgba(255, 255, 255, 0.1);
-    padding: 0.25rem 0.75rem;
-    border-radius: var(--radius-full);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    font-size: 0.9rem;
+    color: var(--color-text);
+    transition: all 0.2s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
+}
+
+.ao-link-button:hover {
+    background: var(--color-primary);
+    color: white;
+    transform: scale(1.05);
+    border-color: var(--color-primary);
+}
+
+.ao-link-button:active {
+    transform: scale(0.95);
 }
 
 .preference-details {
@@ -227,6 +247,21 @@
         gap: 0.5rem;
     }
 
+    .preference-header .project-name {
+        order: 1;
+        align-self: stretch;
+    }
+
+    .preference-header .ao-link-button {
+        order: 2;
+        align-self: flex-start;
+    }
+
+    .preference-header .percentage {
+        order: 3;
+        align-self: flex-end;
+    }
+
     .info-row {
         flex-direction: column;
         align-items: flex-start;
@@ -239,10 +274,6 @@
 
     .info-row span:last-child {
         text-align: left;
-    }
-
-    .percentage {
-        align-self: flex-end;
     }
 
     .debug-entries {

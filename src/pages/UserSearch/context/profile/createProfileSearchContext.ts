@@ -1,8 +1,8 @@
 import { createContext } from 'react'
-import type { ProfileRegistryEntry } from '../../utils/profile/profileService'
+import type { ProfileInfo } from '../../utils/profile/profileService'
 
 interface ProfileSearchState {
-    profiles: ProfileRegistryEntry[]
+    profiles: ProfileInfo[]
     loading: boolean
     error: string | null
 }

@@ -3,30 +3,37 @@ import './UserSearch.css'
 import { UserSearchProvider } from './context/UserSearchContext'
 import { useProfileSearch } from './context/profile/useProfileSearch'
 import { useDelegationSearch } from './context/delegation/useDelegationSearch'
-import { SearchForm, ProfileCard, DelegationCard } from './components'
+import { usePortfolioSearch } from './context/portfolio/usePortfolioSearch'
+import { SearchForm, ProfileCard, DelegationCard, PortfolioCard } from './components'
 
 function UserSearchContent() {
     const [searchedWallet, setSearchedWallet] = useState<string | null>(null)
+    const [isSearching, setIsSearching] = useState(false)
     const profileSearch = useProfileSearch()
     const delegationSearch = useDelegationSearch()
+    const portfolioSearch = usePortfolioSearch()
 
     const handleSearch = async (walletAddress: string) => {
         setSearchedWallet(walletAddress)
+        setIsSearching(true)
 
-        // Search both profile and delegation data
-        await Promise.all([
-            profileSearch.searchProfiles(walletAddress),
-            delegationSearch.searchDelegations(walletAddress)
-        ])
+        // Start all searches simultaneously but don't wait for them to complete
+        profileSearch.searchProfiles(walletAddress)
+        delegationSearch.searchDelegations(walletAddress)
+        portfolioSearch.calculatePortfolio(walletAddress)
+
+        // Only disable search form briefly to prevent rapid re-searches
+        setTimeout(() => {
+            setIsSearching(false)
+        }, 1000)
     }
 
-    const isLoading = profileSearch.loading || delegationSearch.loading
-    const hasError = profileSearch.error || delegationSearch.error
+    const hasError = profileSearch.error || delegationSearch.error || portfolioSearch.error
 
     return (
         <div className="user-search">
             <div className="user-search-container">
-                <SearchForm onSearch={handleSearch} loading={isLoading} />
+                <SearchForm onSearch={handleSearch} loading={isSearching} />
 
                 {hasError && (
                     <div className="error-section">
@@ -40,19 +47,20 @@ function UserSearchContent() {
                                 Delegation Error: {delegationSearch.error}
                             </div>
                         )}
+                        {portfolioSearch.error && (
+                            <div className="error-message">
+                                Portfolio Error: {portfolioSearch.error}
+                            </div>
+                        )}
                     </div>
                 )}
 
-                {isLoading && (
-                    <div className="loading-section">
-                        <div className="loading-spinner" />
-                        <div>Loading user data...</div>
-                    </div>
-                )}
-
-                {searchedWallet && !isLoading && (
+                {searchedWallet && (
                     <div className="results-section">
-                        <div className="results-grid">
+                        <div className="portfolio-section">
+                            <PortfolioCard />
+                        </div>
+                        <div className="cards-grid">
                             <ProfileCard walletAddress={searchedWallet} />
                             <DelegationCard walletAddress={searchedWallet} />
                         </div>

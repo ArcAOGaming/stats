@@ -1,5 +1,7 @@
-import { ProfileRegistryClient } from 'ao-js-sdk'
-import type { ProfileRegistryEntry as SDKProfileEntry } from 'ao-js-sdk/dist/src/clients/bazar/profile-registry/abstract/types'
+import { ProfilesService } from 'ao-js-sdk'
+
+// Export the ProfileInfo type from ao-js-sdk for use in other components
+export type { ProfileInfo } from 'ao-js-sdk'
 
 export interface ProfileRegistryEntry {
     ProfileId?: string
@@ -8,24 +10,17 @@ export interface ProfileRegistryEntry {
 }
 
 /**
- * Searches for user profiles by wallet address
+ * Searches for user profiles by wallet address using ProfilesService
  * @param walletAddress The wallet address to search for
- * @returns Promise that resolves with profile entries
+ * @returns Promise that resolves with detailed profile information
  */
-export async function searchProfilesByWallet(walletAddress: string): Promise<ProfileRegistryEntry[]> {
+export async function searchProfilesByWallet(walletAddress: string): Promise<import('ao-js-sdk').ProfileInfo[]> {
     try {
-        const client = await ProfileRegistryClient.autoConfiguration()
+        const profilesService = ProfilesService.getInstance()
 
         // Pass the wallet address as a parameter to the method
-        console.log('Searching profiles for wallet:', walletAddress)
-        const sdkProfiles = await client.getProfileByWalletAddress(walletAddress)
-
-        // Transform SDK types to our internal types
-        const profiles: ProfileRegistryEntry[] = (sdkProfiles as SDKProfileEntry[]).map(profile => ({
-            ProfileId: profile.ProfileId,
-            CallerAddress: profile.CallerAddress,
-            ...profile
-        }))
+        console.log('Searching detailed profiles for wallet:', walletAddress)
+        const profiles = await profilesService.getProfileInfosByWalletAddress([walletAddress])
 
         return profiles
     } catch (error) {

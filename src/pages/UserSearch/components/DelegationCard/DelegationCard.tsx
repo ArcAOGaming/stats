@@ -50,6 +50,15 @@ export function DelegationCard({ walletAddress }: DelegationCardProps) {
                             <div key={index} className="preference-entry">
                                 <div className="preference-header">
                                     <span className="project-name">{preference.projectName}</span>
+                                    <a
+                                        href={`https://www.ao.link/#/entity/${preference.walletTo}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="ao-link-button"
+                                        title="View on AO Link"
+                                    >
+                                        🔗
+                                    </a>
                                     <span className="percentage">{preference.percentage}%</span>
                                 </div>
                                 <div className="preference-details">
