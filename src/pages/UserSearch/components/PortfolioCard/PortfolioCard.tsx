@@ -1,4 +1,5 @@
 import { usePortfolioSearch } from '../../context/portfolio/usePortfolioSearch'
+import { PortfolioValueState } from '../../context/portfolio/createPortfolioSearchContext'
 import './PortfolioCard.css'
 
 export function PortfolioCard() {
@@ -33,19 +34,55 @@ export function PortfolioCard() {
         })
     }
 
-    if (loading) {
-        return (
-            <div className="portfolio-card">
-                <h3>Portfolio Worth</h3>
-                <div className="portfolio-loading">
-                    <div className="loading-spinner" />
-                    <span>Calculating portfolio worth...</span>
+    // Component for individual portfolio value display
+    const PortfolioValueDisplay = ({
+        valueState,
+        formatter,
+        label
+    }: {
+        valueState: PortfolioValueState
+        formatter: (value: string | number) => string
+        label: string
+    }) => {
+        if (valueState.loading) {
+            return (
+                <div className="portfolio-worth-item">
+                    <div className="worth-value loading">
+                        <div className="loading-spinner-small" />
+                        <span>Loading...</span>
+                    </div>
+                    <span className="worth-label">{label}</span>
                 </div>
+            )
+        }
+
+        if (valueState.error) {
+            return (
+                <div className="portfolio-worth-item">
+                    <div className="worth-value error">
+                        <span>Error</span>
+                    </div>
+                    <span className="worth-label error">{label}</span>
+                    <span className="worth-error-detail">{valueState.error}</span>
+                </div>
+            )
+        }
+
+        return (
+            <div className="portfolio-worth-item">
+                <span className="worth-value">{formatter(valueState.value)}</span>
+                <span className="worth-label">{label}</span>
+                {valueState.lastUpdated && (
+                    <span className="worth-last-updated">
+                        Updated: {formatLastUpdated(valueState.lastUpdated)}
+                    </span>
+                )}
             </div>
         )
     }
 
-    if (error) {
+    // If there's an overall error (initialization failed), show it
+    if (error && !loading) {
         return (
             <div className="portfolio-card">
                 <h3>Portfolio Worth</h3>
@@ -61,18 +98,21 @@ export function PortfolioCard() {
             <h3>Portfolio Worth</h3>
             <div className="portfolio-content">
                 <div className="portfolio-values">
-                    <div className="portfolio-worth-item">
-                        <span className="worth-value usd">{formatCurrency(usdWorth, '$')}</span>
-                        <span className="worth-label">USD Value</span>
-                    </div>
-                    <div className="portfolio-worth-item">
-                        <span className="worth-value ao">{formatCurrency(aoWorth, '')} AO</span>
-                        <span className="worth-label">AO Value</span>
-                    </div>
-                    <div className="portfolio-worth-item">
-                        <span className="worth-value ar">{formatArweaveBalance(arweaveBalance)}</span>
-                        <span className="worth-label">Arweave Balance</span>
-                    </div>
+                    <PortfolioValueDisplay
+                        valueState={usdWorth}
+                        formatter={(value) => formatCurrency(value as string, '$')}
+                        label="USD Value"
+                    />
+                    <PortfolioValueDisplay
+                        valueState={aoWorth}
+                        formatter={(value) => `${formatCurrency(value as string, '')} AO`}
+                        label="AO Value"
+                    />
+                    <PortfolioValueDisplay
+                        valueState={arweaveBalance}
+                        formatter={(value) => formatArweaveBalance(value as number)}
+                        label="Arweave Balance"
+                    />
                 </div>
                 <div className="portfolio-meta">
                     <span className="last-updated">
@@ -83,7 +123,14 @@ export function PortfolioCard() {
                         onClick={refreshPortfolio}
                         disabled={loading}
                     >
-                        🔄 Refresh
+                        {loading ? (
+                            <>
+                                <div className="loading-spinner-small" />
+                                Refreshing...
+                            </>
+                        ) : (
+                            <>🔄 Refresh</>
+                        )}
                     </button>
                 </div>
             </div>

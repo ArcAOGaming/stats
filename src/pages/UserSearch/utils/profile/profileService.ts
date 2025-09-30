@@ -16,18 +16,26 @@ export interface ProfileRegistryEntry {
  */
 export async function searchProfilesByWallet(walletAddress: string): Promise<import('ao-js-sdk').ProfileInfo[]> {
     try {
+        console.log('Initializing ProfilesService for wallet:', walletAddress)
+
+        // Use getInstance method which was the original approach
         const profilesService = ProfilesService.getInstance()
 
         // Pass the wallet address as a parameter to the method
         console.log('Searching detailed profiles for wallet:', walletAddress)
         const profiles = await profilesService.getProfileInfosByWalletAddress([walletAddress])
 
+        console.log('Successfully fetched profiles:', profiles)
         return profiles
     } catch (error) {
-        console.error('Profile search error:', error)
-        // For now, return empty array instead of throwing to prevent blocking the UI
-        console.warn(`Profile search failed for wallet ${walletAddress}, returning empty results`)
-        return []
+        console.error('Profile search error details:', error)
+
+        // Improved error handling - throw specific errors instead of hiding them
+        if (error instanceof Error) {
+            throw new Error(`Failed to fetch profiles for ${walletAddress}: ${error.message}`)
+        } else {
+            throw new Error(`Failed to fetch profiles for ${walletAddress}: Unknown error occurred`)
+        }
     }
 }
 

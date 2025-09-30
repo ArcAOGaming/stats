@@ -20,6 +20,7 @@ export function ProfileSearchProvider({ children }: { children: ReactNode }) {
 
         try {
             const profiles = await searchProfilesByWallet(walletAddress)
+            console.log('Fetched profiles:', profiles)
             setState(prev => ({ ...prev, profiles, loading: false }))
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Failed to fetch profiles'

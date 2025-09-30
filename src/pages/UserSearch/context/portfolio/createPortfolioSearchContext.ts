@@ -1,10 +1,18 @@
 import { createContext } from 'react'
 
+export interface PortfolioValueState {
+    value: string | number
+    loading: boolean
+    error: string | null
+    lastUpdated: Date | null
+}
+
 export interface PortfolioData {
-    usdWorth: string
-    aoWorth: string
-    arweaveBalance: number
+    usdWorth: PortfolioValueState
+    aoWorth: PortfolioValueState
+    arweaveBalance: PortfolioValueState
     lastUpdated: Date
+    // Keep overall loading/error for backward compatibility and overall state
     loading: boolean
     error: string | null
 }
