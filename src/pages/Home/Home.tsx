@@ -70,6 +70,17 @@ function Home() {
               <span className="card-action">View Dashboard</span>
             </div>
           </Link>
+
+          <Link to="/user-search" className="card">
+            <div className="card-content">
+              <div className="card-icon">🔍</div>
+              <h3>User Search</h3>
+              <p>Search and analyze user profiles and delegation information by wallet address</p>
+            </div>
+            <div className="card-footer">
+              <span className="card-action">Search Users</span>
+            </div>
+          </Link>
         </div>
       </section>
     </div>

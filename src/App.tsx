@@ -11,6 +11,7 @@ const Game = createRoute(() => import('./pages/Game/Game'))
 const RANDAO = createRoute(() => import('./pages/RANDAO/RANDAO'))
 const PI = createRoute(() => import('./pages/PI/PI'))
 const RuneRealm = createRoute(() => import('./pages/RuneRealm/RuneRealm'))
+const UserSearch = createRoute(() => import('./pages/UserSearch/UserSearch'))
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
                   <Route path="/randao" element={<RANDAO />} />
                   <Route path="/pi" element={<PI />} />
                   <Route path="/rune-realm" element={<RuneRealm />} />
+                  <Route path="/user-search" element={<UserSearch />} />
                 </Routes>
               </Suspense>
             </Layout>
