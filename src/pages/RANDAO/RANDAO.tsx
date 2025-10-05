@@ -10,8 +10,10 @@ import {
     aggregateDataByTime,
     calculateRANDAOStats,
     formatQuantity,
-    formatTimestamp
+    formatTimestamp,
+    RandAOStatsProvider
 } from '../../utils/randao'
+import { TotalRandomnessSection, RandomnessOverTimeSection } from './components'
 import { Subscription } from 'rxjs'
 
 type GraphType = 'aggregate' | 'monthly'
@@ -22,12 +24,11 @@ interface MonthlyData {
     count: number
 }
 
-function RANDAO() {
+function RANDAOContent() {
     const [dataPoints, setDataPoints] = useState<RANDAODataPoint[]>([])
     const [aggregatedData, setAggregatedData] = useState<AggregatedRANDAOData[]>([])
     const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([])
     const [stats, setStats] = useState<RANDAOStats | null>(null)
-    const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [isConnected, setIsConnected] = useState(false)
     const [selectedGraph, setSelectedGraph] = useState<GraphType>('aggregate')
@@ -36,7 +37,6 @@ function RANDAO() {
     useEffect(() => {
         const startStream = () => {
             try {
-                setLoading(true)
                 setError(null)
 
                 // Subscribe to real-time RNG faucet sales stream
@@ -54,23 +54,19 @@ function RANDAO() {
                             })
                         }
                         setIsConnected(true)
-                        setLoading(false)
                     },
                     error: (err) => {
                         console.error('RANDAO stream error:', err)
                         setError('Failed to connect to RANDAO data stream')
                         setIsConnected(false)
-                        setLoading(false)
                     },
                     complete: () => {
                         setIsConnected(false)
-                        setLoading(false)
                     }
                 })
             } catch (err) {
                 console.error('Failed to start RANDAO stream:', err)
                 setError('Failed to initialize RANDAO data stream')
-                setLoading(false)
             }
         }
 
@@ -130,7 +126,6 @@ function RANDAO() {
         setAggregatedData([])
         setStats(null)
         setError(null)
-        setLoading(true)
 
         // Restart the stream
         const startStream = () => {
@@ -148,30 +143,26 @@ function RANDAO() {
                             })
                         }
                         setIsConnected(true)
-                        setLoading(false)
                     },
                     error: (err) => {
                         console.error('RANDAO stream error:', err)
                         setError('Failed to connect to RANDAO data stream')
                         setIsConnected(false)
-                        setLoading(false)
                     },
                     complete: () => {
                         setIsConnected(false)
-                        setLoading(false)
                     }
                 })
             } catch (err) {
                 console.error('Failed to start RANDAO stream:', err)
                 setError('Failed to initialize RANDAO data stream')
-                setLoading(false)
             }
         }
 
         startStream()
     }
 
-    // Create plot data based on selected graph type
+    // Create plot data based on selected graph type (existing functionality)
     const getPlotData = () => {
         if (selectedGraph === 'aggregate' && aggregatedData.length > 0) {
             return [{
@@ -274,34 +265,12 @@ function RANDAO() {
         displaylogo: false,
     }
 
-    if (loading && dataPoints.length === 0) {
-        return (
-            <div className="randao-message">
-                <div className="loading-spinner" />
-                <div>Connecting to RANDAO data stream...</div>
-            </div>
-        )
-    }
-
-    if (error && dataPoints.length === 0) {
-        return (
-            <div className="randao-message">
-                <div className="error-message">
-                    {error}
-                    <button onClick={retryConnection} className="retry-button">
-                        Retry Connection
-                    </button>
-                </div>
-            </div>
-        )
-    }
-
     return (
         <div className="randao">
             <div className="randao-container">
                 <div className="randao-header">
-                    <h1>RANDAO RNG Faucet Sales</h1>
-                    <p>Real-time visualization of RNG faucet sales data from the AO network</p>
+                    <h1>RANDAO Analytics Dashboard</h1>
+                    <p>Real-time visualization of RANDAO data from the AO network</p>
                     {isConnected && (
                         <div className="real-time-indicator">
                             <div className="real-time-dot"></div>
@@ -310,32 +279,58 @@ function RANDAO() {
                     )}
                 </div>
 
-                <div className="graph-selector">
-                    <label htmlFor="graph-type">Graph Type:</label>
-                    <select
-                        id="graph-type"
-                        value={selectedGraph}
-                        onChange={(e) => setSelectedGraph(e.target.value as GraphType)}
-                        className="graph-dropdown"
-                    >
-                        <option value="aggregate">Aggregate Sales Over Time</option>
-                        <option value="monthly">Monthly Sales</option>
-                    </select>
+                {/* New Total Randomness Created Section */}
+                <TotalRandomnessSection />
+
+                {/* New Randomness Over Time Section */}
+                <RandomnessOverTimeSection />
+
+                {/* Existing RNG Faucet Sales Section */}
+                <div className="faucet-sales-section">
+                    <h2>RNG Faucet Sales</h2>
+                    <div className="graph-selector">
+                        <label htmlFor="graph-type">Graph Type:</label>
+                        <select
+                            id="graph-type"
+                            value={selectedGraph}
+                            onChange={(e) => setSelectedGraph(e.target.value as GraphType)}
+                            className="graph-dropdown"
+                        >
+                            <option value="aggregate">Aggregate Sales Over Time</option>
+                            <option value="monthly">Monthly Sales</option>
+                        </select>
+                    </div>
+
+                    <div className="randao-plot">
+                        {plotData.length > 0 ? (
+                            <Plot
+                                data={plotData}
+                                layout={layout}
+                                config={config}
+                                useResizeHandler
+                                style={{ width: '100%', height: '100%' }}
+                            />
+                        ) : (
+                            <div className="loading-spinner" />
+                        )}
+                    </div>
                 </div>
 
-                <div className="randao-plot">
-                    <Plot
-                        data={plotData}
-                        layout={layout}
-                        config={config}
-                        useResizeHandler
-                        style={{ width: '100%', height: '100%' }}
-                    />
-                </div>
+                {/* Show error message if connection fails, but don't hide the whole page */}
+                {error && (
+                    <div className="randao-stats">
+                        <div className="error-message">
+                            {error}
+                            <button onClick={retryConnection} className="retry-button">
+                                Retry Connection
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 {stats && (
                     <div className="randao-stats">
-                        <h2>RANDAO Statistics</h2>
+                        <h2>RANDAO Sales Statistics</h2>
                         <div className="stats-grid">
                             <div className="stat-card">
                                 <h3>Total Quantity</h3>
@@ -407,6 +402,14 @@ function RANDAO() {
                 )}
             </div>
         </div>
+    )
+}
+
+function RANDAO() {
+    return (
+        <RandAOStatsProvider>
+            <RANDAOContent />
+        </RandAOStatsProvider>
     )
 }
 

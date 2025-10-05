@@ -1,0 +1,219 @@
+.randomness-time-section {
+    margin-bottom: 2rem;
+    width: 100%;
+}
+
+.randomness-time-section h2 {
+    color: var(--color-primary);
+    margin: 0 0 1rem 0;
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+.graph-selector {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: var(--color-background-alt);
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.graph-selector label {
+    color: var(--color-text);
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+.graph-dropdown {
+    background: var(--color-background);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+    min-width: 200px;
+}
+
+.graph-dropdown:hover {
+    border-color: var(--color-primary);
+}
+
+.graph-dropdown:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2);
+}
+
+.graph-dropdown:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.graph-dropdown option {
+    background: var(--color-background);
+    color: var(--color-text);
+    padding: 0.5rem;
+}
+
+/* Updating indicator */
+.updating-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-primary);
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+.mini-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--color-border);
+    border-top: 2px solid var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Chart container with proper constraints */
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.chart-loading-overlay {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+    background: rgba(var(--color-background-rgb), 0.9);
+    border-radius: 6px;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid var(--color-border);
+    backdrop-filter: blur(4px);
+}
+
+.loading-spinner-small {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--color-border);
+    border-top: 2px solid var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Graph loading spinner - smaller for in-graph loading */
+.graph-loading-spinner {
+    width: 30px;
+    height: 30px;
+    border: 2px solid var(--color-border);
+    border-top: 2px solid var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.randao-plot {
+    width: 100%;
+    height: 500px;
+    background: var(--color-background-alt);
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Ensure Plotly chart fits properly */
+.randao-plot>div:not(.graph-loading-spinner):not(.error-message):not(.no-data) {
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.error-message {
+    text-align: center;
+    color: var(--color-error);
+    font-size: 1.1rem;
+}
+
+.no-data {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-secondary);
+    font-size: 1.1rem;
+    font-style: italic;
+    gap: 1rem;
+    text-align: center;
+}
+
+/* Responsive design with maintained constraints */
+@media (max-width: 768px) {
+
+    .chart-container,
+    .randao-plot {
+        height: 400px;
+    }
+
+    .graph-selector {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+
+    .graph-dropdown {
+        min-width: auto;
+    }
+
+    .updating-indicator {
+        justify-content: center;
+    }
+
+    .chart-loading-overlay {
+        top: 5px;
+        right: 5px;
+        padding: 0.3rem;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .chart-container,
+    .randao-plot {
+        height: 350px;
+    }
+
+    .updating-indicator span {
+        display: none;
+    }
+}
