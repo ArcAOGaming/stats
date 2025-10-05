@@ -1,4 +1,5 @@
 import { CreditNotice } from 'ao-js-sdk/src/services/credit-notices/abstract/types'
+import { TimePeriod, TimeBasedRandomnessData } from './randaoStatsService'
 
 /**
  * Represents processed RANDAO data point for visualization
@@ -36,6 +37,17 @@ export interface RANDAOStats {
     mrr: number // Monthly Recurring Revenue in AO
     arr: number // Annual Recurring Revenue in AO
     uniqueClients: number // Number of unique recipients
+}
+
+/**
+ * RandAO Stats specific data structures
+ */
+export interface RandAOStatsData {
+    totalRandomnessCreated: bigint
+    timeBasedData: TimeBasedRandomnessData[]
+    selectedTimePeriod: TimePeriod
+    loading: boolean
+    error: string | null
 }
 
 /**
@@ -179,8 +191,75 @@ export function formatQuantity(quantity: number): string {
 }
 
 /**
+ * Format bigint randomness value for display
+ */
+export function formatRandomnessCount(value: bigint): string {
+    const num = Number(value)
+
+    if (num >= 1e9) {
+        return `${(num / 1e9).toFixed(2)}B`
+    } else if (num >= 1e6) {
+        return `${(num / 1e6).toFixed(2)}M`
+    } else if (num >= 1e3) {
+        return `${(num / 1e3).toFixed(2)}K`
+    } else {
+        return num.toLocaleString()
+    }
+}
+
+/**
  * Format timestamp for display
  */
 export function formatTimestamp(timestamp: number): string {
     return new Date(timestamp).toLocaleString()
+}
+
+/**
+ * Get time period interval in milliseconds
+ */
+export function getTimePeriodInterval(period: TimePeriod): number {
+    switch (period) {
+        case 'daily':
+            return 24 * 60 * 60 * 1000 // 1 day
+        case 'weekly':
+            return 7 * 24 * 60 * 60 * 1000 // 1 week
+        case 'monthly':
+            return 30 * 24 * 60 * 60 * 1000 // 30 days
+        case 'yearly':
+            return 365 * 24 * 60 * 60 * 1000 // 365 days
+        default:
+            return 24 * 60 * 60 * 1000
+    }
+}
+
+/**
+ * Get time period display label
+ */
+export function getTimePeriodLabel(period: TimePeriod): string {
+    switch (period) {
+        case 'daily':
+            return 'Daily'
+        case 'weekly':
+            return 'Weekly'
+        case 'monthly':
+            return 'Monthly'
+        case 'yearly':
+            return 'Yearly'
+        default:
+            return 'Daily'
+    }
+}
+
+/**
+ * Aggregate time-based randomness data by period
+ * Note: Data from RandAOStatsService already comes aggregated by the service
+ */
+export function aggregateRandomnessByPeriod(
+    data: TimeBasedRandomnessData[],
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    period: TimePeriod
+): TimeBasedRandomnessData[] {
+    // Since data from RandAOStatsService is already properly aggregated by period,
+    // we just need to ensure it's sorted by timestamp
+    return data.sort((a, b) => a.timestamp - b.timestamp)
 }
