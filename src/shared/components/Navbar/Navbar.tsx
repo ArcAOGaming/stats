@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
+import { ConnectArweaveAOWalletButton } from '../ConnectArweaveAOWalletButton'
 import './Navbar.css'
 
 function Navbar() {
@@ -27,6 +28,10 @@ function Navbar() {
         >
           GAME Dashboard
         </Link>
+      </div>
+
+      <div className="navbar-wallet">
+        <ConnectArweaveAOWalletButton />
       </div>
     </nav>
   )

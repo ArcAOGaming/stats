@@ -81,6 +81,17 @@ function Home() {
               <span className="card-action">Search Users</span>
             </div>
           </Link>
+
+          <Link to="/pi-compounder" className="card">
+            <div className="card-content">
+              <div className="card-icon">🔄</div>
+              <h3>Pi-Compounder</h3>
+              <p>Manage and withdraw AO and PI proceeds from Fair Launch Process</p>
+            </div>
+            <div className="card-footer">
+              <span className="card-action">Manage Withdrawals</span>
+            </div>
+          </Link>
         </div>
       </section>
     </div>

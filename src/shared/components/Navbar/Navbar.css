@@ -11,6 +11,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 2rem;
   padding: 0 2rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -95,12 +96,28 @@
   opacity: 1;
 }
 
+.navbar-wallet {
+  margin-left: auto;
+}
+
 @media (max-width: 768px) {
   .navbar {
     padding: 0 1rem;
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 60px;
+    padding: 0.5rem 1rem;
   }
   
   .navbar-links {
     gap: 1rem;
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    padding-top: 0.5rem;
+  }
+
+  .navbar-wallet {
+    margin-left: 0;
   }
 }
